@@ -1,0 +1,44 @@
+{
+  "name": "react-tapable",
+  "version": "1.0.0",
+  "description": "React's subscription publication library",
+  "source": "src/index.ts",
+  "main": "lib/index.js",
+  "module": "lib/index.esm.js",
+  "types": "lib/index.d.ts",
+  "unpkg": "lib/index.umd.js",
+  "scripts": {
+    "build:clear": "yarn run clear && yarn run build",
+    "dev:clear": "yarn run clear && yarn run dev",
+    "build": "microbundle --define process.env.NODE_ENV=production --sourcemap false --jsx React.createElement --tsconfig ./tsconfig.json",
+    "dev": "microbundle --define process.env.NODE_ENV=development --sourcemap true --jsx React.createElement --tsconfig ./tsconfig.json",
+    "watch": "microbundle watch --define process.env.NODE_ENV=development --sourcemap true --jsx React.createElement --tsconfig ./tsconfig.json",
+    "clear": "rm -rf lib",
+    "commit": "git-cz",
+    "lint-ts": "tslint -c tslint.json 'src/**/*.ts'"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/TyrealHu/react-tapable.git"
+  },
+  "keywords": ["react", "tapable"],
+  "author": "tyrealhu",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/TyrealHu/react-tapable/issues"
+  },
+  "homepage": "https://github.com/TyrealHu/react-tapable#readme",
+  "devDependencies": {
+    "@commitlint/cli": "^16.3.0",
+    "@commitlint/config-conventional": "^16.2.4",
+    "microbundle": "^0.12.3",
+    "ts-jest": "^26.0.0",
+    "tslint": "^5.14.0",
+    "typescript": "^3.4.5"
+  },
+  "husky": {
+    "hooks": {
+      "commit-msg": "commitlint -E HUSKY_GIT_PARAMS"
+    }
+  }
+}
