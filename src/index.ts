@@ -1,1 +1,4 @@
-console.log('test123124')
+import SyncHook from './SyncHook'
+import SyncWaterfallHook from './SyncWaterfallHook'
+
+export { SyncHook, SyncWaterfallHook }

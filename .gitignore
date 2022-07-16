@@ -8,6 +8,9 @@ lerna-debug.log*
 
 # Diagnostic reports (https://nodejs.org/api/report.html)
 report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
+# ide
+
+.idea/
 
 # Runtime data
 pids
@@ -104,3 +107,5 @@ dist
 .tern-port
 
 lib
+
+

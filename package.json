@@ -34,7 +34,8 @@
     "microbundle": "^0.12.3",
     "ts-jest": "^26.0.0",
     "tslint": "^5.14.0",
-    "typescript": "^3.4.5"
+    "typescript": "^3.4.5",
+    "prettier": "^2.0.0"
   },
   "husky": {
     "hooks": {

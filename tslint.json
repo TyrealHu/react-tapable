@@ -9,7 +9,12 @@
     "no-console": false,
     "quotemark": false,
     "semicolon": false,
-    "trailing-comma": false
+    "interface-name": false,
+    "trailing-comma": false,
+    "object-literal-sort-keys": false,
+    "variable-name": false,
+    "no-trailing-whitespace": false,
+    "space-before-function-paren": false
   },
   "rulesDirectory": ["./src/"]
 }

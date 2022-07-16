@@ -3751,6 +3751,11 @@ postcss@^7.0.0, postcss@^7.0.1, postcss@^7.0.27, postcss@^7.0.32:
     picocolors "^0.2.1"
     source-map "^0.6.1"
 
+prettier@^2.0.0:
+  version "2.7.1"
+  resolved "http://bnpm.byted.org/prettier/-/prettier-2.7.1.tgz#e235806850d057f97bb08368a4f7d899f7760c64"
+  integrity sha512-ujppO+MkdPqoVINuDFDRLClm7D78qbDt0/NR+wp5FqEZOoTNAjPHWj17QRhu7geIHJfcNhRk1XVQmF8Bp3ye+g==
+
 pretty-bytes@^3.0.0:
   version "3.0.1"
   resolved "http://bnpm.byted.org/pretty-bytes/-/pretty-bytes-3.0.1.tgz#27d0008d778063a0b4811bb35c79f1bd5d5fbccf"
