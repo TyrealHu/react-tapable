@@ -8,6 +8,7 @@
   "types": "lib/index.d.ts",
   "unpkg": "lib/index.umd.js",
   "scripts": {
+    "test": "node examples/AyncSeriesWaterfallAllHook.js",
     "build:clear": "yarn run clear && yarn run build",
     "dev:clear": "yarn run clear && yarn run dev",
     "build": "microbundle --define process.env.NODE_ENV=production --sourcemap false --jsx React.createElement --tsconfig ./tsconfig.json",

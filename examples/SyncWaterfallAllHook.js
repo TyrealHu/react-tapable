@@ -11,4 +11,4 @@ hook.tap('test2', (name, height) => {
 })
 
 const r = hook.call('test', 2)
-console.log(r)
+console.log(r) //result [testAB, 8]

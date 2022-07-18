@@ -1,6 +1,6 @@
 class CodeFactory {
   protected _args: string[] | undefined
-  private options: HookCompileOptions | undefined
+  protected options: HookCompileOptions | undefined
 
   // @ts-ignore
   content(options: CodeFactoryContent) {
@@ -322,7 +322,8 @@ class CodeFactory {
     rethrowIfPossible,
     onTap = (_i, run) => run()
   }: CodeFactoryContent & {
-    onTap: (...args: any[]) => any
+    // 每一个tap hook之间连接的作用
+    onTap?: (...args: any[]) => any
   }) {
     if (!this.options) {
       return ''

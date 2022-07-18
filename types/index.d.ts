@@ -7,7 +7,9 @@ interface HookCompileOptions {
 }
 
 interface CodeFactoryContent {
+  // 执行函数的时候，出error如何处理
   onError: (...args: any[]) => any
+  // 执行函数的时候，有返回值的处理
   onResult?: (...args: any[]) => any
   resultReturns?: boolean
   onDone: () => any

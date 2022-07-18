@@ -5,27 +5,27 @@ const deprecateContext = deprecate(() => {},
 'Hook.context is deprecated and will be removed')
 
 class Hook {
+  // use to cache origin call func
+  protected _call: (...args: any[]) => any
+  // use to cache call tap func
+  protected call: (...args: any[]) => any
+  // use to cache origin call func
+  protected _callAsync: (...args: any[]) => any
+  // use to cache call tapAsync func
+  protected callAsync: (...args: any[]) => any
+  // use to cache origin call func
+  protected _promise: (...args: any[]) => any
+  // use to cache call tapPromise func
+  protected promise: (...args: any[]) => any
   // use to cache arguments for tap function
   private _args: string[]
   // use to cache hook's name
   private name: string
   // use to cache taps function
   private taps: HooksTapsItem[]
-  // use to cache origin call func
-  private _call: (...args: any[]) => any
-  // use to cache call tap func
-  private call: (...args: any[]) => any
-  // use to cache origin call func
-  private _callAsync: (...args: any[]) => any
-  // use to cache call tapAsync func
-  private callAsync: (...args: any[]) => any
-  // use to cache origin call func
-  private _promise: (...args: any[]) => any
-  // use to cache call tapPromise func
-  private promise: (...args: any[]) => any
 
   constructor(args: string[], name?: string) {
-    this._args = args
+    this._args = args || []
     this.name = name || ''
     this.taps = []
 
