@@ -1,7 +1,7 @@
 import CodeFactory from './CodeFactory'
 import Hook from './Hook'
 
-class SyncWaterfallHookCodeFactory extends CodeFactory {
+class SyncWaterfallAllHookCodeFactory extends CodeFactory {
   content({
     onError,
     onResult,
@@ -13,28 +13,39 @@ class SyncWaterfallHookCodeFactory extends CodeFactory {
       onResult: (_i, result, next) => {
         let code = ''
         code += `if(${result} !== undefined) {\n`
-        // @ts-ignore
-        code += `${this._args[0]} = ${result};\n`
+        code += `if (!(${result} instanceof Array)){ \n`
+        code += `${result} = [${result}]\n`
+        code += '}\n'
+        if (this._args) {
+          for (let _argI = 0; _argI < this._args.length; _argI++) {
+            code += [
+              `if (${result}[${_argI}]) {`,
+              // @ts-ignore
+              `${this._args[_argI]} = ${result}[${_argI}];`,
+              '}\n'
+            ].join('\n')
+          }
+        }
         code += `}\n`
         code += next()
         return code
       },
       // @ts-ignore
-      onDone: () => onResult(this._args[0]),
+      onDone: () => onResult(`[${this._args.toString()}]`),
       doneReturns: resultReturns,
       rethrowIfPossible
     })
   }
 }
 
-const codeFactory = new SyncWaterfallHookCodeFactory()
+const codeFactory = new SyncWaterfallAllHookCodeFactory()
 
-class SyncWaterfallHook extends Hook {
+class SyncWaterfallAllHook extends Hook {
   private fns: any[] | undefined
 
   constructor(args: string[], name?: string) {
     if (args.length < 1) {
-      throw new Error('Waterfall hooks must have at least one argument')
+      throw new Error('WaterfallAll hooks must have at least one argument')
     }
 
     super(args, name)
@@ -56,4 +67,4 @@ class SyncWaterfallHook extends Hook {
   }
 }
 
-export default SyncWaterfallHook
+export default SyncWaterfallAllHook
