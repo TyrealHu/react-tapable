@@ -2,7 +2,7 @@ import Hook from '../Hook'
 
 interface UserTapableOptions {
     hook: string
-    context: boolean
+    context?: boolean
     mode: 'tap' | 'tapAsync' | 'tapPromise'
 }
 

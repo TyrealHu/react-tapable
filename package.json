@@ -8,7 +8,6 @@
   "types": "lib/index.d.ts",
   "unpkg": "lib/index.umd.js",
   "scripts": {
-    "test": "node examples/AyncSeriesWaterfallAllHook.js",
     "build:clear": "yarn run clear && yarn run build",
     "dev:clear": "yarn run clear && yarn run dev",
     "build": "microbundle --define process.env.NODE_ENV=production --sourcemap false --jsx React.createElement --tsconfig ./tsconfig.json",
@@ -16,7 +15,8 @@
     "watch": "microbundle watch --define process.env.NODE_ENV=development --sourcemap true --jsx React.createElement --tsconfig ./tsconfig.json",
     "clear": "rm -rf lib",
     "commit": "git-cz",
-    "lint-ts": "tslint -c tslint.json 'src/**/*.ts'"
+    "lint-ts": "tslint -c tslint.json 'src/**/*.ts'",
+    "test": "jest --collect-coverage --silent"
   },
   "repository": {
     "type": "git",
@@ -33,13 +33,20 @@
   },
   "homepage": "https://github.com/TyrealHu/react-tapable#readme",
   "devDependencies": {
+    "@types/jest": "^24.1.0",
+    "@testing-library/react-hooks": "^8.0.1",
     "@commitlint/cli": "^16.3.0",
     "@commitlint/config-conventional": "^16.2.4",
     "@types/react": "^17.0.1",
+    "cz-conventional-changelog": "^3.0.0",
+    "jest": "^24.1.0",
     "microbundle": "^0.12.3",
     "prettier": "^2.0.0",
     "ts-jest": "^26.0.0",
     "tslint": "^5.14.0",
+    "react": "^17.0.1",
+    "react-dom": "^17.0.1",
+    "react-test-renderer": "^17.0.1",
     "typescript": "^3.4.5"
   },
   "peerDependencies": {

@@ -1,0 +1,16 @@
+examples/
+
+.idea/
+.vscode/
+
+.github/
+.git/
+
+yarn.lock
+package-lock.json
+
+__test__/
+
+.rts2_cache_cjs/
+.rts2_cache_es/
+.rts2_cache_umd/

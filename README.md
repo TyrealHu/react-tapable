@@ -357,16 +357,16 @@ const { AsyncSeriesLoopHook } = require('../lib/index.js')
 const hook = new AsyncSeriesLoopHook();
 let num = 0;
 let num1 = 0;
-hook.tap('tap0', ()=>{
+hook.tapAsync('tap0', (cb)=>{
     console.log('tap0', num);
     if( num++ < 1 ) {
-        return false;
+        cb(null, false);
     }
 });
-hook.tap('tap1', ()=>{
+hook.tapAsync('tap1', (cb)=>{
     console.log('tap1', num1);
     if( num1++ < 1 ) {
-        return false;
+        cb(null, false);
     }
 });
 
