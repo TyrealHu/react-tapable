@@ -18,7 +18,7 @@ hook.tapAsync('tap2', (test, cb)=>{
     console.log('tap2, ', test);
     setTimeout(()=>{
         cb();
-    }, 4000);
+    }, 4000)
 });
 
 hook.callAsync('Hello World', ()=>{

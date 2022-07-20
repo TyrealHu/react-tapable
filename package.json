@@ -22,7 +22,10 @@
     "type": "git",
     "url": "git+https://github.com/TyrealHu/react-tapable.git"
   },
-  "keywords": ["react", "tapable"],
+  "keywords": [
+    "react",
+    "tapable"
+  ],
   "author": "tyrealhu",
   "license": "ISC",
   "bugs": {
@@ -32,11 +35,15 @@
   "devDependencies": {
     "@commitlint/cli": "^16.3.0",
     "@commitlint/config-conventional": "^16.2.4",
+    "@types/react": "^17.0.1",
     "microbundle": "^0.12.3",
+    "prettier": "^2.0.0",
     "ts-jest": "^26.0.0",
     "tslint": "^5.14.0",
-    "typescript": "^3.4.5",
-    "prettier": "^2.0.0"
+    "typescript": "^3.4.5"
+  },
+  "peerDependencies": {
+    "react": ">=17.0.1"
   },
   "husky": {
     "hooks": {
