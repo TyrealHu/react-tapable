@@ -1,7 +1,7 @@
 import { renderHook } from '@testing-library/react-hooks'
 import { useState } from 'react'
-import { SyncHook } from '../../lib'
 import { createTapableController } from '../../src'
+import { SyncHook } from '../../src'
 
 describe('React', () => {
     test('createTapableController HooksNameMap', () => {
