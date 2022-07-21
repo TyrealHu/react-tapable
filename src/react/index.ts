@@ -177,10 +177,12 @@ export function createTapableController<T extends Record<string, string>>(
     name: string,
     hooks: ControllerHooks<T>
 ): {
-    HooksNameMap: T
+    HooksNameMap: {
+        [K in keyof T]: K
+    }
     useTapable: (
         rawOptions: {
-            once: boolean
+            once?: boolean
             hook: keyof T
             context?: boolean
             mode: 'tap' | 'tapAsync' | 'tapPromise'
@@ -201,7 +203,9 @@ export function createTapableController<T extends Record<string, string>>(
     ControllerMap.set(name + globalId, controller)
 
     return {
-        HooksNameMap: controller.getHooksNameMap() as T,
+        HooksNameMap: controller.getHooksNameMap() as {
+            [K in keyof T]: K
+        },
         tapableCall: (hooksName: keyof T, ...args: any[]) => controller.call(hooksName, ...args),
         tapableCallAsync: (hooksName: keyof T, ...args: any[]) =>
             controller.callAsync(hooksName, ...args),
@@ -209,7 +213,7 @@ export function createTapableController<T extends Record<string, string>>(
             controller.promise(hooksName, ...args),
         useTapable: (
             rawOptions: {
-                once: boolean
+                once?: boolean
                 hook: keyof T
                 context?: boolean
                 mode: 'tap' | 'tapAsync' | 'tapPromise'

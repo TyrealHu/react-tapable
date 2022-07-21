@@ -1,7 +1,7 @@
 import Hook from '../Hook'
 
 interface UserTapableOptions<T> {
-    once: boolean
+    once?: boolean
     hook: keyof T
     context?: boolean
     mode: 'tap' | 'tapAsync' | 'tapPromise'
