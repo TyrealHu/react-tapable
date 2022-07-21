@@ -22,11 +22,14 @@ class Hook {
     private name: string
     // use to cache taps function
     private taps: HooksTapsItem[]
+    // if hooks has once tap
+    private once: boolean
 
     constructor(args: string[], name?: string) {
         this._args = args || []
         this.name = name || ''
         this.taps = []
+        this.once = false
 
         this._call = function (..._args: any[]) {
             // @ts-ignore
@@ -57,10 +60,13 @@ class Hook {
     }
 
     afterInvoke() {
-        this.taps = this.taps.filter((item) => {
-            return !item.once
-        })
-        this._resetCompilation()
+        if (this.once) {
+            this.taps = this.taps.filter((item) => {
+                return !item.once
+            })
+            this._resetCompilation()
+            this.once = false
+        }
     }
 
     // this function is Abstract to Hooks Class
@@ -104,6 +110,9 @@ class Hook {
 
     _insert(item: HooksTapsItem) {
         this._resetCompilation()
+        if (!this.once && item.once) {
+            this.once = true
+        }
         this.taps.push(item)
     }
 
