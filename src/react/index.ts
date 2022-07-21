@@ -67,6 +67,8 @@ function getNormalizedTapableOptions<T>(
 
     options.name = controller.getHookTapName(rawOptions.hook)
 
+    options.once = Boolean(rawOptions.once)
+
     return options
 }
 
@@ -76,7 +78,7 @@ function useTapable<T>(
     rawFn: (...args: any[]) => any,
     rawUseAliasArr?: any[]
 ) {
-    const { hook, context, fn, useAliasArr, name, type, mode } = getNormalizedTapableOptions<T>(
+    const { hook, context, fn, useAliasArr, name, type, mode, once } = getNormalizedTapableOptions<T>(
         selector,
         rawOptions,
         rawFn,
@@ -87,7 +89,8 @@ function useTapable<T>(
         hook[mode](
             {
                 context,
-                name
+                name,
+                once
             },
             fn
         )
@@ -177,6 +180,7 @@ export function createTapableController<T extends Record<string, string>>(
     HooksNameMap: T
     useTapable: (
         rawOptions: {
+            once: boolean
             hook: keyof T
             context?: boolean
             mode: 'tap' | 'tapAsync' | 'tapPromise'
@@ -205,6 +209,7 @@ export function createTapableController<T extends Record<string, string>>(
             controller.promise(hooksName, ...args),
         useTapable: (
             rawOptions: {
+                once: boolean
                 hook: keyof T
                 context?: boolean
                 mode: 'tap' | 'tapAsync' | 'tapPromise'

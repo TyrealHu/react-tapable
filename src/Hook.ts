@@ -31,23 +31,36 @@ class Hook {
         this._call = function (..._args: any[]) {
             // @ts-ignore
             this.call = this._createCall('sync')
-            return this.call(..._args)
+            const res =  this.call(..._args)
+            this.afterInvoke()
+            return res
         }
         this.call = this._call
 
         this._callAsync = function (..._args: any[]) {
             // @ts-ignore
             this.callAsync = this._createCall('async')
-            return this.callAsync(..._args)
+            const res = this.callAsync(..._args)
+            this.afterInvoke()
+            return res
         }
         this.callAsync = this._callAsync
 
         this._promise = function (..._args: any[]) {
             // @ts-ignore
             this.promise = this._createCall('promise')
-            return this.promise(..._args)
+            const res = this.promise(..._args)
+            this.afterInvoke()
+            return res
         }
         this.promise = this._promise
+    }
+
+    afterInvoke() {
+        this.taps = this.taps.filter((item) => {
+            return !item.once
+        })
+        this._resetCompilation()
     }
 
     // this function is Abstract to Hooks Class
@@ -97,7 +110,8 @@ class Hook {
     _tap(type: Types, options: UserTapOptions, fn: (...args: any[]) => any) {
         const tapOptions = {
             name: '',
-            context: false
+            context: false,
+            once: false
         }
         if (typeof options === 'string') {
             tapOptions.name = options.trim()
@@ -113,6 +127,8 @@ class Hook {
                 deprecateContext()
                 tapOptions.context = options.context
             }
+
+            tapOptions.once = Boolean(options.once)
         }
 
         this._insert({

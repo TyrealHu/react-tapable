@@ -22,13 +22,15 @@ type FunctionArray = () => any[]
 interface HooksTapOptions {
   name?: string
   context?: boolean
+  once?: boolean
 }
 
 interface HooksTapsItem {
   type: Types
   fn: () => any
   name: string
-  context: boolean
+  context: boolean,
+  once: boolean
 }
 
 type UserTapOptions = HooksTapOptions | string
