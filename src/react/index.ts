@@ -10,14 +10,14 @@ const ModeTypeMap: Record<string, 'sync' | 'async' | 'promise'> = {
     tapPromise: 'promise'
 }
 
-function getNormalizedTapableOptions(
+function getNormalizedTapableOptions<T>(
     selector: string,
-    rawOptions: UserTapableOptions,
+    rawOptions: UserTapableOptions<T>,
     rawFn: (...args: any[]) => any,
     rawUseAliasArr?: any[]
 ): NormalizedUserTapableOptions {
     const options = {} as NormalizedUserTapableOptions
-    const controller = ControllerMap.get(selector) as Controller
+    const controller = ControllerMap.get(selector) as Controller<T>
 
     if (typeof rawOptions.mode !== 'string') {
         throw new Error(`react-tapable: rawOptions' mode must be string`)
@@ -70,13 +70,13 @@ function getNormalizedTapableOptions(
     return options
 }
 
-function useTapable(
+function useTapable<T>(
     selector: string,
-    rawOptions: UserTapableOptions,
+    rawOptions: UserTapableOptions<T>,
     rawFn: (...args: any[]) => any,
     rawUseAliasArr?: any[]
 ) {
-    const { hook, context, fn, useAliasArr, name, type, mode } = getNormalizedTapableOptions(
+    const { hook, context, fn, useAliasArr, name, type, mode } = getNormalizedTapableOptions<T>(
         selector,
         rawOptions,
         rawFn,
@@ -98,12 +98,12 @@ function useTapable(
     }, [...useAliasArr])
 }
 
-export class Controller {
+export class Controller<T> {
     public name: string
-    public hooks: ControllerHooks
+    public hooks: ControllerHooks<T>
     public count: Record<string, number>
 
-    constructor(name: string, hooks: ControllerHooks) {
+    constructor(name: string, hooks: ControllerHooks<T>) {
         this.name = name
         this.hooks = hooks
         this.count = Object.keys(hooks).reduce((pre, cur) => {
@@ -112,7 +112,7 @@ export class Controller {
         }, {} as Record<string, number>)
     }
 
-    call(hooksName: string, ...args: any[]): any {
+    call(hooksName: keyof T, ...args: any[]): any {
         const hook = this.getHook(hooksName)
 
         if (!hook) {
@@ -123,7 +123,7 @@ export class Controller {
         return
     }
 
-    callAsync(hooksName: string, ...args: any[]): any {
+    callAsync(hooksName: keyof T, ...args: any[]): any {
         const hook = this.getHook(hooksName)
 
         if (!hook) {
@@ -134,7 +134,7 @@ export class Controller {
         return
     }
 
-    promise(hooksName: string, ...args: any[]): Promise<any> {
+    promise(hooksName: keyof T, ...args: any[]): Promise<any> {
         const hook = this.getHook(hooksName)
 
         if (!hook) {
@@ -144,7 +144,7 @@ export class Controller {
         return hook.promise(...args)
     }
 
-    getHook(key: string): Hook | undefined {
+    getHook(key: keyof T): Hook | undefined {
         if (this.hooks.hasOwnProperty(key)) {
             return this.hooks[key]
         }
@@ -172,37 +172,45 @@ export class Controller {
 
 export function createTapableController<T extends Record<string, string>>(
     name: string,
-    hooks: ControllerHooks
+    hooks: ControllerHooks<T>
 ): {
     HooksNameMap: T
     useTapable: (
-        rawOptions: UserTapableOptions,
+        rawOptions: {
+            hook: keyof T
+            context?: boolean
+            mode: 'tap' | 'tapAsync' | 'tapPromise'
+        },
         rawFn: (...args: any[]) => any,
         rawUseAliasArr?: any[]
     ) => any
-    tapableCall: (hooksName: string, ...args: any[]) => any
-    tapableCallAsync: (hooksName: string, ...args: any[]) => any
-    tapablePromise: (hooksName: string, ...args: any[]) => Promise<any>
+    tapableCall: (hooksName: keyof T, ...args: any[]) => any
+    tapableCallAsync: (hooksName: keyof T, ...args: any[]) => any
+    tapablePromise: (hooksName: keyof T, ...args: any[]) => Promise<any>
 } {
     const globalId = getGlobalId()
     if (ControllerMap.has(name + globalId + '')) {
         console.warn(`react-tapable: controller: ${name} has been registed, and it will be covered`)
     }
 
-    const controller = new Controller(name, hooks)
+    const controller = new Controller<T>(name, hooks)
     ControllerMap.set(name + globalId, controller)
 
     return {
         HooksNameMap: controller.getHooksNameMap() as T,
-        tapableCall: (hooksName: string, ...args: any[]) => controller.call(hooksName, ...args),
-        tapableCallAsync: (hooksName: string, ...args: any[]) =>
+        tapableCall: (hooksName: keyof T, ...args: any[]) => controller.call(hooksName, ...args),
+        tapableCallAsync: (hooksName: keyof T, ...args: any[]) =>
             controller.callAsync(hooksName, ...args),
-        tapablePromise: (hooksName: string, ...args: any[]) =>
+        tapablePromise: (hooksName: keyof T, ...args: any[]) =>
             controller.promise(hooksName, ...args),
         useTapable: (
-            rawOptions: UserTapableOptions,
+            rawOptions: {
+                hook: keyof T
+                context?: boolean
+                mode: 'tap' | 'tapAsync' | 'tapPromise'
+            },
             rawFn: (...args: any[]) => any,
             rawUseAliasArr?: any[]
-        ) => useTapable(name + globalId, rawOptions, rawFn, rawUseAliasArr)
+        ) => useTapable<T>(name + globalId, rawOptions, rawFn, rawUseAliasArr)
     }
 }

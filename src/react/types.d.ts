@@ -1,7 +1,7 @@
 import Hook from '../Hook'
 
-interface UserTapableOptions {
-    hook: string
+interface UserTapableOptions<T> {
+    hook: keyof T
     context?: boolean
     mode: 'tap' | 'tapAsync' | 'tapPromise'
 }
@@ -16,6 +16,6 @@ interface NormalizedUserTapableOptions {
     useAliasArr: any[]
 }
 
-interface ControllerHooks {
-    [key: string]: Hook
+type ControllerHooks<T> = {
+    [K in keyof T]: Hook
 }
