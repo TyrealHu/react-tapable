@@ -4,6 +4,35 @@ import { createTapableController } from '../../src'
 import { SyncHook } from '../../src'
 
 describe('React', () => {
+    test('createTapableController tapHook', () => {
+        const { tapHook, call } = createTapableController<{
+            testOne: string
+            testTwo: string
+        }>('Test', {
+            // @ts-ignore
+            testOne: new SyncHook([]),
+            // @ts-ignore
+            testTwo: new SyncHook([])
+        })
+
+        let count = 1
+
+        tapHook(
+            {
+                once: false,
+                hook: 'testOne',
+                mode: 'tap'
+            },
+            () => {
+                count += 1
+            }
+        )
+
+        call('testOne')
+
+        expect(count).toEqual(2)
+    })
+
     test('createTapableController HooksNameMap', () => {
         const { HooksNameMap } = createTapableController('Test', {
             // @ts-ignore
@@ -16,7 +45,7 @@ describe('React', () => {
     })
 
     test('createTapableController useTapable', async () => {
-        const { HooksNameMap, useTapable, tapableCall } = createTapableController<{
+        const { HooksNameMap, useTapable, call } = createTapableController<{
             testOne: string
             testTwo: string
         }>('Test', {
@@ -48,7 +77,7 @@ describe('React', () => {
                 setState(2)
 
                 setTimeout(() => {
-                    tapableCall(HooksNameMap.testOne)
+                    call(HooksNameMap.testOne)
                 })
             }
         })
@@ -60,5 +89,40 @@ describe('React', () => {
         })
 
         expect(pass).toBe(2)
+    })
+
+    test('createTapableController removeTapHook', () => {
+        const { tapHook, call, removeTapHook } = createTapableController<{
+            testOne: string
+            testTwo: string
+        }>('Test', {
+            // @ts-ignore
+            testOne: new SyncHook([]),
+            // @ts-ignore
+            testTwo: new SyncHook([])
+        })
+
+        let count = 1
+
+        const fn = () => {
+            count += 1
+        }
+
+        tapHook(
+            {
+                once: false,
+                hook: 'testOne',
+                mode: 'tap'
+            },
+            fn
+        )
+
+        call('testOne')
+
+        removeTapHook('testOne', 'tap', fn)
+
+        call('testOne')
+
+        expect(count).toEqual(2)
     })
 })

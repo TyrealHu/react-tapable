@@ -2,88 +2,17 @@ import { useEffect } from 'react'
 import Hook from '../Hook'
 import { ControllerMap, getGlobalId } from './global'
 import type { UserTapableOptions } from './types'
-import { ControllerHooks, NormalizedUserTapableOptions } from './types'
+import { ControllerHooks } from './types'
+import { getNormalizedTapableOptions, ModeTypeMap, throwError } from './utils'
 
-const ModeTypeMap: Record<string, 'sync' | 'async' | 'promise'> = {
-    tap: 'sync',
-    tapAsync: 'async',
-    tapPromise: 'promise'
-}
-
-function getNormalizedTapableOptions<T>(
+function useTapable<HooksMap>(
     selector: string,
-    rawOptions: UserTapableOptions<T>,
-    rawFn: (...args: any[]) => any,
-    rawUseAliasArr?: any[]
-): NormalizedUserTapableOptions {
-    const options = {} as NormalizedUserTapableOptions
-    const controller = ControllerMap.get(selector) as Controller<T>
-
-    if (typeof rawOptions.mode !== 'string') {
-        throw new Error(`react-tapable: rawOptions' mode must be string`)
-    } else {
-        if (
-            rawOptions.mode !== 'tap' &&
-            rawOptions.mode !== 'tapAsync' &&
-            rawOptions.mode !== 'tapPromise'
-        ) {
-            throw new Error(
-                `react-tapable: rawOptions' mode must be tap/tapAsync/tapPromise, but get ${rawOptions.mode}`
-            )
-        } else {
-            options.mode = rawOptions.mode
-        }
-    }
-
-    if (typeof rawOptions.hook !== 'string') {
-        throw new Error(
-            `react-tapable: rawOptions' hook must be string, but get ${typeof rawOptions.hook}`
-        )
-    } else {
-        const hook = controller.getHook(rawOptions.hook)
-
-        if (!hook) {
-            throw new Error(
-                `react-tapable: please check to see if the controller has this hook ${rawOptions.hook}`
-            )
-        }
-        options.hook = hook
-    }
-
-    options.type = ModeTypeMap[options.mode]
-
-    if (!(rawFn instanceof Function)) {
-        throw new Error(`react-tapable: rawOptions' fn must be function`)
-    } else {
-        if (options.hook._isRegistered(options.type, rawFn)) {
-            throw new Error(`react-tapable: rawOptions' fn has been registered`)
-        }
-        options.fn = rawFn
-    }
-
-    options.useAliasArr = rawUseAliasArr || []
-
-    options.context = Boolean(rawOptions.context)
-
-    options.name = controller.getHookTapName(rawOptions.hook)
-
-    options.once = Boolean(rawOptions.once)
-
-    return options
-}
-
-function useTapable<T>(
-    selector: string,
-    rawOptions: UserTapableOptions<T>,
+    rawOptions: UserTapableOptions<HooksMap>,
     rawFn: (...args: any[]) => any,
     rawUseAliasArr?: any[]
 ) {
-    const { hook, context, fn, useAliasArr, name, type, mode, once } = getNormalizedTapableOptions<T>(
-        selector,
-        rawOptions,
-        rawFn,
-        rawUseAliasArr
-    )
+    const { hook, context, fn, useAliasArr, name, type, mode, once } =
+        getNormalizedTapableOptions<HooksMap>(selector, rawOptions, rawFn, rawUseAliasArr)
 
     useEffect(() => {
         hook[mode](
@@ -101,12 +30,12 @@ function useTapable<T>(
     }, [...useAliasArr])
 }
 
-export class Controller<T> {
+export class Controller<HooksMap> {
     public name: string
-    public hooks: ControllerHooks<T>
+    public hooks: ControllerHooks<HooksMap>
     public count: Record<string, number>
 
-    constructor(name: string, hooks: ControllerHooks<T>) {
+    constructor(name: string, hooks: ControllerHooks<HooksMap>) {
         this.name = name
         this.hooks = hooks
         this.count = Object.keys(hooks).reduce((pre, cur) => {
@@ -115,7 +44,7 @@ export class Controller<T> {
         }, {} as Record<string, number>)
     }
 
-    call(hooksName: keyof T, ...args: any[]): any {
+    call(hooksName: keyof HooksMap, ...args: any[]): any {
         const hook = this.getHook(hooksName)
 
         if (!hook) {
@@ -126,7 +55,7 @@ export class Controller<T> {
         return
     }
 
-    callAsync(hooksName: keyof T, ...args: any[]): any {
+    callAsync(hooksName: keyof HooksMap, ...args: any[]): any {
         const hook = this.getHook(hooksName)
 
         if (!hook) {
@@ -137,7 +66,7 @@ export class Controller<T> {
         return
     }
 
-    promise(hooksName: keyof T, ...args: any[]): Promise<any> {
+    promise(hooksName: keyof HooksMap, ...args: any[]): Promise<any> {
         const hook = this.getHook(hooksName)
 
         if (!hook) {
@@ -147,7 +76,7 @@ export class Controller<T> {
         return hook.promise(...args)
     }
 
-    getHook(key: keyof T): Hook | undefined {
+    getHook(key: keyof HooksMap): Hook | undefined {
         if (this.hooks.hasOwnProperty(key)) {
             return this.hooks[key]
         }
@@ -171,55 +100,157 @@ export class Controller<T> {
     getHookTapName(hook: string) {
         return `${this.name}:${hook}`
     }
+
+    tapHook(
+        rawOptions: {
+            once?: boolean
+            hook: keyof HooksMap
+            context?: boolean
+            mode: 'tap' | 'tapAsync' | 'tapPromise'
+        },
+        rawFn: (...args: any[]) => any
+    ) {
+        const hook = this.getHook(rawOptions.hook)
+
+        if (!hook) {
+            throwError(`tapHook Cannot find hook by key ${rawOptions.hook}`)
+        }
+
+        if (
+            rawOptions.mode !== 'tap' &&
+            rawOptions.mode !== 'tapAsync' &&
+            rawOptions.mode !== 'tapPromise'
+        ) {
+            throwError(
+                `tapHook rawOptions' mode must be tap/tapAsync/tapPromise, but get ${rawOptions.mode}`
+            )
+        }
+
+        hook[rawOptions.mode](
+            {
+                context: Boolean(rawOptions.context),
+                name: this.getHookTapName(rawOptions.hook as string),
+                once: Boolean(rawOptions.once)
+            },
+            rawFn
+        )
+    }
+
+    removeTapHook(
+        name: keyof HooksMap,
+        mode: 'tap' | 'tapAsync' | 'tapPromise',
+        fn: (...args: any[]) => any
+    ) {
+        const hook = this.getHook(name)
+
+        if (!hook) {
+            throwError(`removeTapHook Cannot find hook by key ${name}`)
+        }
+
+        if (mode !== 'tap' && mode !== 'tapAsync' && mode !== 'tapPromise') {
+            throwError(`removeTapHook mode must be tap/tapAsync/tapPromise, but get ${mode}`)
+        }
+
+        hook._deleteTapHook(ModeTypeMap[mode], fn)
+    }
 }
 
-export function createTapableController<T extends Record<string, string>>(
+export function createTapableController<THooks extends Record<string, string>>(
     name: string,
-    hooks: ControllerHooks<T>
+    hooks: ControllerHooks<THooks>
 ): {
+    /**
+     * This is a map for tapped hooks
+     * */
     HooksNameMap: {
-        [K in keyof T]: K
+        [K in keyof THooks]: K
     }
+    /**
+     * This useHook is used to tap function for React Hooks
+     * */
     useTapable: (
         rawOptions: {
             once?: boolean
-            hook: keyof T
+            hook: keyof THooks
             context?: boolean
             mode: 'tap' | 'tapAsync' | 'tapPromise'
         },
         rawFn: (...args: any[]) => any,
         rawUseAliasArr?: any[]
     ) => any
-    tapableCall: (hooksName: keyof T, ...args: any[]) => any
-    tapableCallAsync: (hooksName: keyof T, ...args: any[]) => any
-    tapablePromise: (hooksName: keyof T, ...args: any[]) => Promise<any>
+    /**
+     * This is a method for call sync function
+     * */
+    call: (hooksName: keyof THooks, ...args: any[]) => any
+    /**
+     * This is a method for call async function, and expected callback
+     * */
+    callAsync: (hooksName: keyof THooks, ...args: any[]) => any
+    /**
+     * This is a method for call promise function, and return Promise Object
+     * */
+    promise: (hooksName: keyof THooks, ...args: any[]) => Promise<any>
+    /**
+     * This function is used to tap function for React Component
+     * */
+    tapHook: (
+        rawOptions: {
+            once?: boolean
+            hook: keyof THooks
+            context?: boolean
+            mode: 'tap' | 'tapAsync' | 'tapPromise'
+        },
+        rawFn: (...args: any[]) => any
+    ) => any
+    /**
+     * This function is used to remove tapped function
+     * */
+    removeTapHook: (
+        hook: keyof THooks,
+        mode: 'tap' | 'tapAsync' | 'tapPromise',
+        fn: (...args: any[]) => any
+    ) => void
 } {
     const globalId = getGlobalId()
     if (ControllerMap.has(name + globalId + '')) {
         console.warn(`react-tapable: controller: ${name} has been registed, and it will be covered`)
     }
 
-    const controller = new Controller<T>(name, hooks)
+    const controller = new Controller<THooks>(name, hooks)
     ControllerMap.set(name + globalId, controller)
 
     return {
         HooksNameMap: controller.getHooksNameMap() as {
-            [K in keyof T]: K
+            [Key in keyof THooks]: Key
         },
-        tapableCall: (hooksName: keyof T, ...args: any[]) => controller.call(hooksName, ...args),
-        tapableCallAsync: (hooksName: keyof T, ...args: any[]) =>
+        call: (hooksName: keyof THooks, ...args: any[]) => controller.call(hooksName, ...args),
+        callAsync: (hooksName: keyof THooks, ...args: any[]) =>
             controller.callAsync(hooksName, ...args),
-        tapablePromise: (hooksName: keyof T, ...args: any[]) =>
+        promise: (hooksName: keyof THooks, ...args: any[]) =>
             controller.promise(hooksName, ...args),
+        tapHook: (
+            rawOptions: {
+                once?: boolean
+                hook: keyof THooks
+                context?: boolean
+                mode: 'tap' | 'tapAsync' | 'tapPromise'
+            },
+            rawFn: (...args: any[]) => any
+        ) => controller.tapHook(rawOptions, rawFn),
+        removeTapHook: (
+            hook: keyof THooks,
+            mode: 'tap' | 'tapAsync' | 'tapPromise',
+            fn: (...args: any[]) => any
+        ) => controller.removeTapHook(hook, mode, fn),
         useTapable: (
             rawOptions: {
                 once?: boolean
-                hook: keyof T
+                hook: keyof THooks
                 context?: boolean
                 mode: 'tap' | 'tapAsync' | 'tapPromise'
             },
             rawFn: (...args: any[]) => any,
             rawUseAliasArr?: any[]
-        ) => useTapable<T>(name + globalId, rawOptions, rawFn, rawUseAliasArr)
+        ) => useTapable<THooks>(name + globalId, rawOptions, rawFn, rawUseAliasArr)
     }
 }

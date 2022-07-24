@@ -14,7 +14,8 @@
     "object-literal-sort-keys": false,
     "variable-name": false,
     "no-trailing-whitespace": false,
-    "space-before-function-paren": false
+    "space-before-function-paren": false,
+    "jsdoc-format": false
   },
   "rulesDirectory": ["./src/"]
 }
