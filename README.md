@@ -1,4 +1,4 @@
-# react-tapable [![Node.js CI](https://github.com/TyrealHu/react-tapable/actions/workflows/nodejs.yml/badge.svg?branch=main)](https://github.com/TyrealHu/react-tapable/actions/workflows/nodejs.yml)[![Coverage Status](https://codecov.io/gh/TyrealHu/react-tapable/branch/master/graph/badge.svg)](https://codecov.io/gh/TyrealHu/react-tapable)
+# react-tapable [![npm version](https://img.shields.io/npm/v/react-tapable.svg?style=flat)](https://www.npmjs.com/package/react-tapable)[![Node.js CI](https://github.com/TyrealHu/react-tapable/actions/workflows/nodejs.yml/badge.svg?branch=main)](https://github.com/TyrealHu/react-tapable/actions/workflows/nodejs.yml)[![Coverage Status](https://codecov.io/gh/TyrealHu/react-tapable/branch/master/graph/badge.svg)](https://codecov.io/gh/TyrealHu/react-tapable)
 
 Module of React subscription and Distribution based on [tapable](https://github.com/webpack/tapable)
 
