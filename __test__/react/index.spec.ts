@@ -1,5 +1,6 @@
 import { renderHook } from '@testing-library/react-hooks'
 import { useState } from 'react'
+import { SyncWaterfallHook } from '../../lib'
 import { createTapableController } from '../../src'
 import { SyncHook } from '../../src'
 
@@ -50,7 +51,7 @@ describe('React', () => {
             testTwo: string
         }>('Test', {
             // @ts-ignore
-            testOne: new SyncHook([]),
+            testOne: new SyncWaterfallHook([]),
             // @ts-ignore
             testTwo: new SyncHook([])
         })
@@ -124,5 +125,51 @@ describe('React', () => {
         call('testOne')
 
         expect(count).toEqual(2)
+    })
+
+    test('createTapableController useTapable waterfall', async () => {
+        const { HooksNameMap, useTapable, call } = createTapableController<{
+            testOne: string
+            testTwo: string
+        }>('Test', {
+            // @ts-ignore
+            testOne: new SyncWaterfallHook(['name'])
+        })
+        let state: any
+        let setState: any
+        let pass: string
+        let invoke = false
+        renderHook(() => {
+            ;[state, setState] = useState('1')
+
+            useTapable(
+                {
+                    hook: HooksNameMap.testOne,
+                    mode: 'tap'
+                },
+                (name: string) => {
+                    return name + state
+                },
+                [state]
+            )
+
+            if (!invoke) {
+                invoke = true
+                setState(2)
+
+                setTimeout(() => {
+                    pass = call(HooksNameMap.testOne, 'name')
+                })
+            }
+        })
+
+        await new Promise((resolve) => {
+            setTimeout(() => {
+                resolve()
+            })
+        })
+
+        // @ts-ignore
+        expect(pass).toBe('name2')
     })
 })
