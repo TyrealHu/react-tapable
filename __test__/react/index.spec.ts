@@ -1,6 +1,6 @@
 import { renderHook } from '@testing-library/react-hooks'
 import { useState } from 'react'
-import { SyncWaterfallHook } from '../../lib'
+import { SyncWaterfallHook } from '../../src'
 import { createTapableController } from '../../src'
 import { SyncHook } from '../../src'
 
