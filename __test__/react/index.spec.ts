@@ -51,7 +51,7 @@ describe('React', () => {
             testTwo: string
         }>('Test', {
             // @ts-ignore
-            testOne: new SyncWaterfallHook([]),
+            testOne: new SyncHook([]),
             // @ts-ignore
             testTwo: new SyncHook([])
         })
