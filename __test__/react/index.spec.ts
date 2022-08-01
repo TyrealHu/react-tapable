@@ -130,7 +130,6 @@ describe('React', () => {
     test('createTapableController useTapable waterfall', async () => {
         const { HooksNameMap, useTapable, call } = createTapableController<{
             testOne: string
-            testTwo: string
         }>('Test', {
             // @ts-ignore
             testOne: new SyncWaterfallHook(['name'])
