@@ -51,8 +51,7 @@ export class Controller<HooksMap> {
             throw new Error(`hook doesn't exist in controller,it' s name : ${hooksName} `)
         }
 
-        hook.call(...args)
-        return
+        return hook.call(...args)
     }
 
     callAsync(hooksName: keyof HooksMap, ...args: any[]): any {
@@ -62,8 +61,7 @@ export class Controller<HooksMap> {
             throw new Error(`hook doesn't exist in controller,it' s name : ${hooksName} `)
         }
 
-        hook.callAsync(...args)
-        return
+        return hook.callAsync(...args)
     }
 
     promise(hooksName: keyof HooksMap, ...args: any[]): Promise<any> {
