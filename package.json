@@ -1,6 +1,6 @@
 {
   "name": "react-tapable",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "React's subscription publication library",
   "source": "src/index.ts",
   "main": "lib/index.js",
@@ -27,7 +27,7 @@
     "tapable"
   ],
   "author": "tyrealhu",
-  "license": "ISC",
+  "license": "MIT",
   "bugs": {
     "url": "https://github.com/TyrealHu/react-tapable/issues"
   },
