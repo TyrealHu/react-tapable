@@ -20,22 +20,14 @@ class AsyncSeriesBailHook extends Hook {
     private fns: any[] | undefined
     constructor(args: string[], name?: string) {
         super(args, name)
+        this.forbiddenCall()
+    }
 
-        this.compile = function (options: HookCompileOptions) {
-            this.fns = []
-            codeFactory.setup(this.fns, options)
+    compile(options: HookCompileOptions) {
+        this.fns = []
+        codeFactory.setup(this.fns, options)
 
-            return codeFactory.create(options)
-        }
-
-        // async hook did not support call
-        this.call = () => {
-            throw new Error('call is not supported on a AsyncSeriesBailHook')
-        }
-
-        this._call = () => {
-            throw new Error('call is not supported on a AsyncSeriesBailHook')
-        }
+        return codeFactory.create(options)
     }
 }
 

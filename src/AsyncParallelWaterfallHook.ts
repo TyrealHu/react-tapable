@@ -1,10 +1,10 @@
 import CodeFactory from './CodeFactory'
 import Hook from './Hook'
 
-class AsyncSeriesWaterfallHookCodeFactory extends CodeFactory {
-    content({ onError, onResult }: CodeFactoryContent) {
-        return this.callTapsSeries({
-            onError: (_i, err, _next, doneBreak) => onError(err) + doneBreak(true),
+class AsyncParallelWaterfallHookCodeFactory extends CodeFactory {
+    content({ onError, onDone }: CodeFactoryContent) {
+        return this.callTapsParallel({
+            onError: (_i, err, _done, doneBreak) => onError(err) + doneBreak(true),
             onResult: (_i, result, next) => {
                 let code = ''
                 code += `if(${result} !== undefined) {\n`
@@ -14,15 +14,14 @@ class AsyncSeriesWaterfallHookCodeFactory extends CodeFactory {
                 code += next()
                 return code
             },
-            // @ts-ignore
-            onDone: () => onResult(this._args[0])
+            onDone
         })
     }
 }
 
-const codeFactory = new AsyncSeriesWaterfallHookCodeFactory()
+const codeFactory = new AsyncParallelWaterfallHookCodeFactory()
 
-class AsyncSeriesWaterfallHook extends Hook {
+class AsyncParallelWaterfallHook extends Hook {
     private fns: any[] | undefined
     constructor(args: string[], name?: string) {
         super(args, name)
@@ -37,4 +36,4 @@ class AsyncSeriesWaterfallHook extends Hook {
     }
 }
 
-export default AsyncSeriesWaterfallHook
+export default AsyncParallelWaterfallHook

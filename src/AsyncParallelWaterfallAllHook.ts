@@ -1,9 +1,9 @@
 import CodeFactory from './CodeFactory'
 import Hook from './Hook'
 
-class AsyncSeriesWaterfallAllHookCodeFactory extends CodeFactory {
+class AsyncParallelWaterfallAllHookCodeFactory extends CodeFactory {
     content({ onError, onResult }: CodeFactoryContent) {
-        return this.callTapsSeries({
+        return this.callTapsParallel({
             onError: (_i, err, _next, doneBreak) => onError(err) + doneBreak(true),
             onResult: (_i, result, next) => {
                 let code = ''
@@ -31,9 +31,9 @@ class AsyncSeriesWaterfallAllHookCodeFactory extends CodeFactory {
     }
 }
 
-const codeFactory = new AsyncSeriesWaterfallAllHookCodeFactory()
+const codeFactory = new AsyncParallelWaterfallAllHookCodeFactory()
 
-class AsyncSeriesWaterfallAllHook extends Hook {
+class AsyncParallelWaterfallAllHook extends Hook {
     private fns: any[] | undefined
     constructor(args: string[], name?: string) {
         super(args, name)
@@ -48,4 +48,4 @@ class AsyncSeriesWaterfallAllHook extends Hook {
     }
 }
 
-export default AsyncSeriesWaterfallAllHook
+export default AsyncParallelWaterfallAllHook
