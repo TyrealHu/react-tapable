@@ -10,16 +10,16 @@
   "scripts": {
     "build:clear": "yarn run clear && yarn run build",
     "dev:clear": "yarn run clear && yarn run dev",
-    "build": "microbundle --define process.env.NODE_ENV=production --no-sourcemap false --jsx React.createElement --tsconfig ./tsconfig.json",
+    "build": "microbundle --define process.env.NODE_ENV=production --sourcemap false --jsx React.createElement --tsconfig ./tsconfig.json",
     "dev": "microbundle --define process.env.NODE_ENV=development --sourcemap true --jsx React.createElement --tsconfig ./tsconfig.json",
     "watch": "microbundle watch --define process.env.NODE_ENV=development --sourcemap true --jsx React.createElement --tsconfig ./tsconfig.json",
     "clear": "rm -rf lib",
     "commit": "git-cz",
     "lint-ts": "tslint -c tslint.json 'src/**/*.ts'",
     "test": "jest --collect-coverage --silent",
-    "release-major": "standard-version --release-as major",
-    "release-minor": "standard-version --release-as minor",
-    "release-patch": "standard-version --release-as patch"
+    "release-major": "yarn build:clear && yarn test && standard-version --release-as major",
+    "release-minor": "yarn build:clear && yarn test && standard-version --release-as minor",
+    "release-patch": "yarn build:clear && yarn test && standard-version --release-as patch"
   },
   "repository": {
     "type": "git",
