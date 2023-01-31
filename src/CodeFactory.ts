@@ -7,6 +7,38 @@ class CodeFactory {
         throw new Error('CodeFactory must be abstract')
     }
 
+    createContentPromiseDone(): () => string {
+        return () => '_resolve();\n'
+    }
+
+    createContentPromiseResult(): (result: any) => string {
+        return (result: any) => `_resolve(${result});\n`
+    }
+
+    createContentAsyncDone(): () => string {
+        return () => '_callback();\n'
+    }
+
+    createContentAsyncResult(): (result: any) => string {
+        return (result: any) => `_callback(null, ${result});\n`
+    }
+
+    createContentAsyncError(): (err: any) => string {
+        return (err) => `_callback(${err});\n`
+    }
+
+    createContentSyncDone(): () => string {
+        return () => ''
+    }
+
+    createContentSyncResult(): (result: any) => string {
+        return (result) => `return ${result};\n`
+    }
+
+    createContentSyncError(): (err: any) => string {
+        return (err) => `throw ${err};\n`
+    }
+
     create(options: HookCompileOptions) {
         this.init(options)
         let fn
@@ -21,10 +53,10 @@ class CodeFactory {
                     '"use strict";\n' +
                         this.header() +
                         this.content({
-                            onError: (err) => `throw ${err};\n`,
-                            onResult: (result) => `return ${result};\n`,
+                            onError: this.createContentSyncError(),
+                            onResult: this.createContentSyncResult(),
                             resultReturns: true,
-                            onDone: () => '',
+                            onDone: this.createContentSyncDone(),
                             rethrowIfPossible: true
                         })
                 )
@@ -37,9 +69,9 @@ class CodeFactory {
                     '"use strict";\n' +
                         this.header() +
                         this.content({
-                            onError: (err) => `_callback(${err});\n`,
-                            onResult: (result: any) => `_callback(null, ${result});\n`,
-                            onDone: () => '_callback();\n'
+                            onError: this.createContentAsyncError(),
+                            onResult: this.createContentAsyncResult(),
+                            onDone: this.createContentAsyncDone()
                         })
                 )
                 break
@@ -50,8 +82,8 @@ class CodeFactory {
                         errorHelperUsed = true
                         return `_error(${err});\n`
                     },
-                    onResult: (result: any) => `_resolve(${result});\n`,
-                    onDone: () => '_resolve();\n'
+                    onResult: this.createContentPromiseResult(),
+                    onDone: this.createContentPromiseDone()
                 })
                 let code = ''
                 code += '"use strict";\n'
@@ -119,6 +151,122 @@ class CodeFactory {
         return false
     }
 
+    callTapPromise(
+        tap: HooksTapsItem,
+        tapIndex: number,
+        onResult: CodeFactoryContent['onResult'],
+        onError: CodeFactoryContent['onError'],
+        onDone: false | (() => any)
+    ) {
+        let code = ''
+        code += `var _hasResult${tapIndex} = false;\n`
+        code += `var _promise${tapIndex} = _fn${tapIndex}(${this.args({
+            before: tap.context ? '_context' : undefined
+        })});\n`
+        code += `if (!_promise${tapIndex} || !_promise${tapIndex}.then)\n`
+        code += `  throw new Error('Tap function (tapPromise) did not return promise (returned ' + _promise${tapIndex} + ')');\n`
+        code += `_promise${tapIndex}.then((function(_result${tapIndex}) {\n`
+        code += `_hasResult${tapIndex} = true;\n`
+        if (onResult) {
+            code += onResult(`_result${tapIndex}`)
+        }
+        if (onDone) {
+            code += onDone()
+        }
+        code += `}), function(_err${tapIndex}) {\n`
+        code += `if(_hasResult${tapIndex}) throw _err${tapIndex};\n`
+        code += onError(`_err${tapIndex}`)
+        code += '});\n'
+
+        return code
+    }
+
+    generateCallTapAsyncCallback(
+        tapIndex: number,
+        onResult: CodeFactoryContent['onResult'],
+        onError: CodeFactoryContent['onError'],
+        onDone: false | (() => any)
+    ) {
+        let cbCode = ''
+        if (onResult) {
+            cbCode += `(function(_err${tapIndex}, _result${tapIndex}) {\n`
+        } else {
+            cbCode += `(function(_err${tapIndex}) {\n`
+        }
+        cbCode += `if(_err${tapIndex}) {\n`
+        cbCode += onError(`_err${tapIndex}`)
+        cbCode += '} else {\n'
+        if (onResult) {
+            cbCode += onResult(`_result${tapIndex}`)
+        }
+        if (onDone) {
+            cbCode += onDone()
+        }
+        cbCode += '}\n'
+        cbCode += '})'
+
+        return cbCode
+    }
+
+    callTapAsync(
+        tap: HooksTapsItem,
+        tapIndex: number,
+        onResult: CodeFactoryContent['onResult'],
+        onError: CodeFactoryContent['onError'],
+        onDone: false | (() => any)
+    ) {
+        let code = ''
+
+        code += `_fn${tapIndex}(${this.args({
+            before: tap.context ? '_context' : undefined,
+            after: this.generateCallTapAsyncCallback(tapIndex, onResult, onError, onDone)
+        })});\n`
+
+        return code
+    }
+
+    callTapSync(
+        tap: HooksTapsItem,
+        tapIndex: number,
+        onResult: CodeFactoryContent['onResult'],
+        onError: CodeFactoryContent['onError'],
+        onDone: false | (() => any),
+        rethrowIfPossible?: boolean
+    ) {
+        let code = ''
+        if (!rethrowIfPossible) {
+            code += `var _hasError${tapIndex} = false;\n`
+            code += 'try {\n'
+        }
+        if (onResult) {
+            code += `var _result${tapIndex} = _fn${tapIndex}(${this.args({
+                before: tap.context ? '_context' : undefined
+            })});\n`
+        } else {
+            code += `_fn${tapIndex}(${this.args({
+                before: tap.context ? '_context' : undefined
+            })});\n`
+        }
+        if (!rethrowIfPossible) {
+            code += '} catch(_err) {\n'
+            code += `_hasError${tapIndex} = true;\n`
+            code += onError('_err')
+            code += '}\n'
+            code += `if(!_hasError${tapIndex}) {\n`
+        }
+        if (onResult) {
+            code += onResult(`_result${tapIndex}`)
+        }
+        if (onDone) {
+            code += onDone()
+        }
+        if (!rethrowIfPossible) {
+            code += '}\n'
+        }
+
+        return code
+    }
+
     callTap(
         tapIndex: number,
         {
@@ -137,78 +285,20 @@ class CodeFactory {
         const tap = this.options.taps[tapIndex]
         switch (tap.type) {
             case 'sync':
-                if (!rethrowIfPossible) {
-                    code += `var _hasError${tapIndex} = false;\n`
-                    code += 'try {\n'
-                }
-                if (onResult) {
-                    code += `var _result${tapIndex} = _fn${tapIndex}(${this.args({
-                        before: tap.context ? '_context' : undefined
-                    })});\n`
-                } else {
-                    code += `_fn${tapIndex}(${this.args({
-                        before: tap.context ? '_context' : undefined
-                    })});\n`
-                }
-                if (!rethrowIfPossible) {
-                    code += '} catch(_err) {\n'
-                    code += `_hasError${tapIndex} = true;\n`
-                    code += onError('_err')
-                    code += '}\n'
-                    code += `if(!_hasError${tapIndex}) {\n`
-                }
-                if (onResult) {
-                    code += onResult(`_result${tapIndex}`)
-                }
-                if (onDone) {
-                    code += onDone()
-                }
-                if (!rethrowIfPossible) {
-                    code += '}\n'
-                }
+                code += this.callTapSync(
+                    tap,
+                    tapIndex,
+                    onResult,
+                    onError,
+                    onDone,
+                    rethrowIfPossible
+                )
                 break
             case 'async':
-                let cbCode = ''
-                if (onResult) {
-                    cbCode += `(function(_err${tapIndex}, _result${tapIndex}) {\n`
-                } else {
-                    cbCode += `(function(_err${tapIndex}) {\n`
-                }
-                cbCode += `if(_err${tapIndex}) {\n`
-                cbCode += onError(`_err${tapIndex}`)
-                cbCode += '} else {\n'
-                if (onResult) {
-                    cbCode += onResult(`_result${tapIndex}`)
-                }
-                if (onDone) {
-                    cbCode += onDone()
-                }
-                cbCode += '}\n'
-                cbCode += '})'
-                code += `_fn${tapIndex}(${this.args({
-                    before: tap.context ? '_context' : undefined,
-                    after: cbCode
-                })});\n`
+                code += this.callTapAsync(tap, tapIndex, onResult, onError, onDone)
                 break
             case 'promise':
-                code += `var _hasResult${tapIndex} = false;\n`
-                code += `var _promise${tapIndex} = _fn${tapIndex}(${this.args({
-                    before: tap.context ? '_context' : undefined
-                })});\n`
-                code += `if (!_promise${tapIndex} || !_promise${tapIndex}.then)\n`
-                code += `  throw new Error('Tap function (tapPromise) did not return promise (returned ' + _promise${tapIndex} + ')');\n`
-                code += `_promise${tapIndex}.then((function(_result${tapIndex}) {\n`
-                code += `_hasResult${tapIndex} = true;\n`
-                if (onResult) {
-                    code += onResult(`_result${tapIndex}`)
-                }
-                if (onDone) {
-                    code += onDone()
-                }
-                code += `}), function(_err${tapIndex}) {\n`
-                code += `if(_hasResult${tapIndex}) throw _err${tapIndex};\n`
-                code += onError(`_err${tapIndex}`)
-                code += '});\n'
+                code += this.callTapPromise(tap, tapIndex, onResult, onError, onDone)
                 break
         }
         return code
