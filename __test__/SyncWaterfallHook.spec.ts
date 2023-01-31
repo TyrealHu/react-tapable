@@ -17,6 +17,17 @@ describe('SyncWaterfallHook', () => {
         expect(count).toBe(2)
     })
 
+    test('error zero param', async () => {
+        let res = false
+        try {
+            // @ts-ignore
+            const _ = new SyncWaterfallHook([])
+        } catch (e) {
+            res = true
+        }
+        expect(res).toBe(true)
+    })
+
     test('tap args', () => {
         const hook = new SyncWaterfallHook(['name'])
 

@@ -93,6 +93,41 @@ describe('AsyncParallelResultAllHook', () => {
         })
     })
 
+    test('tap tapPromise promise with one', async () => {
+        const hook = new AsyncParallelResultAllHook([])
+        hook.tapPromise('test1', () => {
+            return Promise.resolve('test1')
+        })
+
+        const res = await hook.promise()
+
+        expect(res).toEqual({
+            test1: 'test1'
+        })
+    })
+
+    test('tap tapAsync call', async () => {
+        const hook = new AsyncParallelResultAllHook([])
+        hook.tapAsync('test1', (cb) => {
+            cb(null, 'test1')
+        })
+
+        hook.tapAsync('test2', (cb) => {
+            setTimeout(() => {
+                cb(null, 'test2')
+            }, 1000)
+        })
+
+        let res = false
+        try {
+            hook.call()
+        } catch (e) {
+            res = true
+        }
+
+        expect(res).toBe(true)
+    })
+
     test('tap tapPromise promise error', async () => {
         const hook = new AsyncParallelResultAllHook([])
         hook.tapPromise('test1', () => {

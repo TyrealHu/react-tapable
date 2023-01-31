@@ -80,4 +80,26 @@ describe('AsyncParallelBailHook', () => {
 
         expect(res).toBe('test1')
     })
+
+    test('tap tapAsync call error', async () => {
+        const hook = new AsyncParallelBailHook([])
+        hook.tapAsync('test1', (cb) => {
+            cb(null, 'test1')
+        })
+
+        hook.tapAsync('test2', (cb) => {
+            setTimeout(() => {
+                cb(null, 'test2')
+            }, 1000)
+        })
+
+        let res = false
+        try {
+            hook.call()
+        } catch (e) {
+            res = true
+        }
+
+        expect(res).toBe(true)
+    })
 })

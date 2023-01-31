@@ -17,6 +17,35 @@ describe('SyncHook', () => {
         expect(count).toBe(2)
     })
 
+    test('tap tapPromise', () => {
+        const hook = new SyncHook([])
+
+        let res = false
+        try {
+            hook.tapPromise()
+
+            hook.callAsync()
+        } catch (e) {
+            res = true
+        }
+
+        expect(res).toBe(true)
+    })
+
+    test('tap tapAsync', () => {
+        const hook = new SyncHook([])
+
+        let res = false
+        try {
+            hook.tapAsync()
+            hook.promise()
+        } catch (e) {
+            res = true
+        }
+
+        expect(res).toBe(true)
+    })
+
     test('tap args', () => {
         const hook = new SyncHook(['name'])
 

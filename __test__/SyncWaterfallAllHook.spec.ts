@@ -30,6 +30,17 @@ describe('SyncWaterfallAllHook', () => {
         expect(tapArg).toBe('tyreal')
     })
 
+    test('error zero param', async () => {
+        let res = false
+        try {
+            // @ts-ignore
+            const _ = new SyncWaterfallAllHook([])
+        } catch (e) {
+            res = true
+        }
+        expect(res).toBe(true)
+    })
+
     test('tap waterfall object', () => {
         const hook = new SyncWaterfallAllHook(['options'])
 

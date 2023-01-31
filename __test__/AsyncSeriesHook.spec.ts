@@ -26,6 +26,29 @@ describe('AsyncSeriesHook', () => {
         expect(res).toBe('test1test2')
     })
 
+    test('tap tapAsync callAsync', async () => {
+        const hook = new AsyncSeriesHook([])
+
+        hook.tapAsync('test1', (cb) => {
+            cb()
+        })
+
+        hook.tapAsync('test2', (cb) => {
+            setTimeout(() => {
+                cb()
+            }, 500)
+        })
+
+        let res = false
+        try {
+            hook.call()
+        } catch (e) {
+            res = true
+        }
+
+        expect(res).toBe(true)
+    })
+
     test('tap tapAsync promise', async () => {
         const hook = new AsyncSeriesHook([])
         let res = ''
