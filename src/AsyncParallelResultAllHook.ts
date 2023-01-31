@@ -12,6 +12,10 @@ class AsyncParallelResultAllHookCodeFactory extends CodeFactory {
         return () => '_resolve(asyncParallelResMap);\n'
     }
 
+    createContentAsyncDone(): () => string {
+        return () => '_callback(null, asyncParallelResMap);\n'
+    }
+
     content({ onError, onResult, onDone }: CodeFactoryContent) {
         let code = ''
         if (!this.options || !onResult) {

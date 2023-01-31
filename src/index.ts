@@ -1,5 +1,6 @@
 import AsyncParallelBailHook from './AsyncParallelBailHook'
 import AsyncParallelHook from './AsyncParallelHook'
+import AsyncParallelResultAllHook from './AsyncParallelResultAllHook'
 import AsyncSeriesBailHook from './AsyncSeriesBailHook'
 import AsyncSeriesHook from './AsyncSeriesHook'
 import AsyncSeriesLoopHook from './AsyncSeriesLoopHook'
@@ -28,5 +29,6 @@ export {
     AsyncSeriesLoopHook,
     AsyncSeriesBailHook,
     AsyncSeriesWaterfallAllHook,
-    AsyncSeriesWaterfallHook
+    AsyncSeriesWaterfallHook,
+    AsyncParallelResultAllHook
 }

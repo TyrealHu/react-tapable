@@ -34,7 +34,6 @@ class Hook {
         this._call = function (..._args: any[]) {
             // @ts-ignore
             this.call = this._createCall('sync')
-            console.log(this.call.toString())
             const res = this.call(..._args)
             this.afterInvoke()
             return res
@@ -44,7 +43,6 @@ class Hook {
         this._callAsync = function (..._args: any[]) {
             // @ts-ignore
             this.callAsync = this._createCall('async')
-            console.log(this.callAsync.toString())
             const res = this.callAsync(..._args)
             this.afterInvoke()
             return res
@@ -54,7 +52,6 @@ class Hook {
         this._promise = function (..._args: any[]) {
             // @ts-ignore
             this.promise = this._createCall('promise')
-            console.log(this.promise.toString())
             const res = this.promise(..._args)
             this.afterInvoke()
             return res

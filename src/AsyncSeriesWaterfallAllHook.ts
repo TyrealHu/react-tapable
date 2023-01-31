@@ -36,6 +36,10 @@ const codeFactory = new AsyncSeriesWaterfallAllHookCodeFactory()
 class AsyncSeriesWaterfallAllHook extends Hook {
     private fns: any[] | undefined
     constructor(args: string[], name?: string) {
+        if (args.length < 1) {
+            throw new Error('Waterfall hooks must have at least one argument')
+        }
+
         super(args, name)
         this.forbiddenCall()
     }
