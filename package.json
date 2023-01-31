@@ -16,7 +16,10 @@
     "clear": "rm -rf lib",
     "commit": "git-cz",
     "lint-ts": "tslint -c tslint.json 'src/**/*.ts'",
-    "test": "jest --collect-coverage --silent"
+    "test": "jest --collect-coverage --silent",
+    "release-major": "standard-version --release-as major",
+    "release-minor": "standard-version --release-as minor",
+    "release-patch": "standard-version --release-as patch"
   },
   "repository": {
     "type": "git",
@@ -48,7 +51,8 @@
     "ts-jest": "^26.0.0",
     "ts-node": "^10.9.1",
     "tslint": "^5.14.0",
-    "typescript": "^3.4.5"
+    "typescript": "^3.4.5",
+    "standard-version": "^9.5.0"
   },
   "peerDependencies": {
     "react": ">=17.0.1",
