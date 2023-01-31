@@ -1,6 +1,6 @@
 {
   "name": "react-tapable",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "description": "React's subscription publication library",
   "source": "src/index.ts",
   "main": "lib/index.js",
