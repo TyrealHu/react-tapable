@@ -16,3 +16,5 @@ __test__/
 .rts2_cache_umd/
 
 start.ts
+
+src/
