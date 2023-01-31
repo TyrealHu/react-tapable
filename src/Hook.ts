@@ -34,7 +34,7 @@ class Hook {
         this._call = function (..._args: any[]) {
             // @ts-ignore
             this.call = this._createCall('sync')
-            const res =  this.call(..._args)
+            const res = this.call(..._args)
             this.afterInvoke()
             return res
         }
@@ -202,6 +202,36 @@ class Hook {
         }
 
         return index
+    }
+
+    forbiddenCall() {
+        this.call = () => {
+            throw new Error(`call is not supported on a ${this.name}`)
+        }
+
+        this._call = () => {
+            throw new Error(`call is not supported on a ${this.name}`)
+        }
+    }
+
+    forbiddenCallAsync() {
+        this.callAsync = () => {
+            throw new Error(`callAsync is not supported on a ${this.name}`)
+        }
+
+        this._callAsync = () => {
+            throw new Error(`callAsync is not supported on a ${this.name}`)
+        }
+    }
+
+    forbiddenPromise() {
+        this.promise = () => {
+            throw new Error(`promise is not supported on a ${this.name}`)
+        }
+
+        this._promise = () => {
+            throw new Error(`promise is not supported on a ${this.name}`)
+        }
     }
 }
 

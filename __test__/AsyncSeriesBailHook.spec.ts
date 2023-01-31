@@ -35,6 +35,26 @@ describe('AsyncSeriesBailHook', () => {
         expect(res).toBe('test2')
     })
 
+    test('tap tapPromise call', async () => {
+        const hook = new AsyncSeriesBailHook([])
+        hook.tapPromise('test1', () => {
+            return Promise.resolve('test1')
+        })
+
+        hook.tapPromise('test2', () => {
+            return Promise.resolve('test2')
+        })
+
+        let res = false
+        try {
+            hook.call()
+        } catch (e) {
+            res = true
+        }
+
+        expect(res).toBe(true)
+    })
+
     test('tap tapPromise callAsync', async () => {
         const hook = new AsyncSeriesBailHook([])
         hook.tapPromise('test1', () => {

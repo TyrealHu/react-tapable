@@ -21,13 +21,13 @@ class SyncBailHook extends Hook {
     private fns: any[] | undefined
     constructor(args: string[], name?: string) {
         super(args, name)
+    }
 
-        this.compile = function (options: HookCompileOptions) {
-            this.fns = []
-            codeFactory.setup(this.fns, options)
+    compile(options: HookCompileOptions) {
+        this.fns = []
+        codeFactory.setup(this.fns, options)
 
-            return codeFactory.create(options)
-        }
+        return codeFactory.create(options)
     }
 
     tapAsync() {

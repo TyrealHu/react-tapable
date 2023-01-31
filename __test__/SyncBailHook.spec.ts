@@ -17,6 +17,36 @@ describe('SyncBailHook', () => {
         expect(count).toBe(2)
     })
 
+    test('tap tapPromise', () => {
+        const hook = new SyncBailHook([])
+
+        let res = false
+        try {
+            // tslint:disable-next-line:no-empty
+            hook.tapPromise()
+
+            hook.call()
+        } catch (e) {
+            res = true
+        }
+
+        expect(res).toBe(true)
+    })
+
+    test('tap tapAsync', () => {
+        const hook = new SyncBailHook([])
+
+        let res = false
+        try {
+            hook.tapAsync()
+            hook.promise()
+        } catch (e) {
+            res = true
+        }
+
+        expect(res).toBe(true)
+    })
+
     test('tap args', () => {
         const hook = new SyncBailHook(['name'])
 

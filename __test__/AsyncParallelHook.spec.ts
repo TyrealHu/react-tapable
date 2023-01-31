@@ -1,6 +1,29 @@
 import AsyncParallelHook from '../src/AsyncParallelHook'
 
 describe('AsyncParallelHook', () => {
+    test('tap tapAsync call', async () => {
+        const hook = new AsyncParallelHook([])
+
+        hook.tapAsync('test1', (cb) => {
+            cb()
+        })
+
+        hook.tapAsync('test2', (cb) => {
+            setTimeout(() => {
+                cb()
+            }, 1000)
+        })
+
+        let res = false
+        try {
+            hook.call()
+        } catch (e) {
+            res = true
+        }
+
+        expect(res).toBe(true)
+    })
+
     test('tap tapAsync callAsync', async () => {
         const hook = new AsyncParallelHook([])
 

@@ -25,23 +25,19 @@ const codeFactory = new AsyncSeriesWaterfallHookCodeFactory()
 class AsyncSeriesWaterfallHook extends Hook {
     private fns: any[] | undefined
     constructor(args: string[], name?: string) {
+        if (args.length < 1) {
+            throw new Error('Waterfall hooks must have at least one argument')
+        }
+
         super(args, name)
+        this.forbiddenCall()
+    }
 
-        this.compile = function (options: HookCompileOptions) {
-            this.fns = []
-            codeFactory.setup(this.fns, options)
+    compile(options: HookCompileOptions) {
+        this.fns = []
+        codeFactory.setup(this.fns, options)
 
-            return codeFactory.create(options)
-        }
-
-        // async hook did not support call
-        this.call = () => {
-            throw new Error('call is not supported on a AsyncSeriesWaterfallHook')
-        }
-
-        this._call = () => {
-            throw new Error('call is not supported on a AsyncSeriesWaterfallHook')
-        }
+        return codeFactory.create(options)
     }
 }
 

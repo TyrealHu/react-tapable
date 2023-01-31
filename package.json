@@ -10,13 +10,16 @@
   "scripts": {
     "build:clear": "yarn run clear && yarn run build",
     "dev:clear": "yarn run clear && yarn run dev",
-    "build": "microbundle --define process.env.NODE_ENV=production --sourcemap false --jsx React.createElement --tsconfig ./tsconfig.json",
+    "build": "microbundle --define process.env.NODE_ENV=production --no-sourcemap false --jsx React.createElement --tsconfig ./tsconfig.json",
     "dev": "microbundle --define process.env.NODE_ENV=development --sourcemap true --jsx React.createElement --tsconfig ./tsconfig.json",
     "watch": "microbundle watch --define process.env.NODE_ENV=development --sourcemap true --jsx React.createElement --tsconfig ./tsconfig.json",
     "clear": "rm -rf lib",
     "commit": "git-cz",
     "lint-ts": "tslint -c tslint.json 'src/**/*.ts'",
-    "test": "jest --collect-coverage --silent"
+    "test": "jest --collect-coverage --silent",
+    "release-major": "standard-version --release-as major",
+    "release-minor": "standard-version --release-as minor",
+    "release-patch": "standard-version --release-as patch"
   },
   "repository": {
     "type": "git",
@@ -33,21 +36,23 @@
   },
   "homepage": "https://github.com/TyrealHu/react-tapable#readme",
   "devDependencies": {
-    "@types/jest": "^24.1.0",
-    "@testing-library/react-hooks": "^8.0.1",
     "@commitlint/cli": "^16.3.0",
     "@commitlint/config-conventional": "^16.2.4",
+    "@testing-library/react-hooks": "^8.0.1",
+    "@types/jest": "^24.1.0",
     "@types/react": "^17.0.1",
     "cz-conventional-changelog": "^3.0.0",
     "jest": "^24.1.0",
     "microbundle": "^0.12.3",
     "prettier": "^2.0.0",
-    "ts-jest": "^26.0.0",
-    "tslint": "^5.14.0",
     "react": "^17.0.1",
     "react-dom": "^17.0.1",
     "react-test-renderer": "^17.0.1",
-    "typescript": "^3.4.5"
+    "ts-jest": "^26.0.0",
+    "ts-node": "^10.9.1",
+    "tslint": "^5.14.0",
+    "typescript": "^3.4.5",
+    "standard-version": "^9.5.0"
   },
   "peerDependencies": {
     "react": ">=17.0.1",

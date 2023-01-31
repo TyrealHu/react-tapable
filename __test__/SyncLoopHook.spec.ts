@@ -47,6 +47,35 @@ describe('SyncLoopHook', () => {
         expect(contextName).toBe('test1test2')
     })
 
+    test('tap tapAsync', () => {
+        const hook = new SyncLoopHook([])
+
+        let res = false
+        try {
+            hook.tapAsync()
+
+            hook.callAsync()
+        } catch (e) {
+            res = true
+        }
+
+        expect(res).toBe(true)
+    })
+
+    test('tap tapPromise', () => {
+        const hook = new SyncLoopHook([])
+
+        let res = false
+        try {
+            hook.tapPromise()
+            hook.promise()
+        } catch (e) {
+            res = true
+        }
+
+        expect(res).toBe(true)
+    })
+
     test('tap loop count', () => {
         const hook = new SyncLoopHook([])
         let count = 0
